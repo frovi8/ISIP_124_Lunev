@@ -106,6 +106,10 @@ namespace ConsoleApp1
                     case "2":
                         break;
                     case "3":
+                        BubbleSortByPrice(names, amounts);
+                        Console.WriteLine("Список отсортирован по цене (по возрастанию).");
+                        PrintOperations(names, amounts);
+                        break;
                         break;
                     case "4":
                         break;
@@ -153,6 +157,36 @@ namespace ConsoleApp1
             Console.WriteLine($"Среднее:   {average:0.00} руб.");
             Console.WriteLine($"Максимум:  {max:0.00} руб.");
             Console.WriteLine($"Минимум:   {min:0.00} руб.");
+        }
+        static void BubbleSortByPrice(string[] names, double[] amounts)
+        {
+            int n = amounts.Length;
+
+            for (int i = 0; i < n - 1; i++)
+            {
+                for (int j = 0; j < n - 1 - i; j++)
+                {
+                    if (amounts[j] > amounts[j + 1])
+                    {
+                        Swap(ref amounts[j], ref amounts[j + 1]);
+                        Swap(ref names[j], ref names[j + 1]);
+                    }
+                }
+            }
+        }
+
+        static void Swap(ref double a, ref double b)
+        {
+            double temp = a;
+            a = b;
+            b = temp;
+        }
+
+        static void Swap(ref string a, ref string b)
+        {
+            string temp = a;
+            a = b;
+            b = temp;
         }
     }
 }

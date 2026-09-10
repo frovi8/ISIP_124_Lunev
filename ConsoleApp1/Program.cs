@@ -121,5 +121,13 @@ namespace ConsoleApp1
                 }
             }
         }
+        static void PrintOperations(string[] names, double[] amounts)
+        {
+            Console.WriteLine("\n--- Список трат ---");
+            for (int i = 0; i < names.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}. {names[i]} — {amounts[i]:0.00} руб.");
+            }
+        }
     }
 }

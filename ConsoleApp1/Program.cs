@@ -18,6 +18,7 @@ namespace ConsoleApp1
             double[] amounts = new double[count];
 
             ReadOperations(names, amounts);
+            RunMenu(names, amounts);
         }
 
         static int ReadOperationsCount()
@@ -78,6 +79,45 @@ namespace ConsoleApp1
 
                     names[i] = name;
                     amounts[i] = amount;
+                }
+            }
+        }
+         static void RunMenu(string[] names, double[] amounts)
+        {
+            bool running = true;
+
+            while (running)
+            {
+                Console.WriteLine("\n===== МЕНЮ =====");
+                Console.WriteLine("1. Вывод данных");
+                Console.WriteLine("2. Статистика (среднее, максимальное, минимальное, сумма)");
+                Console.WriteLine("3. Сортировка по цене (пузырьковая сортировка)");
+                Console.WriteLine("4. Конвертация валюты");
+                Console.WriteLine("5. Поиск по названию");
+                Console.WriteLine("0. Выход");
+                Console.Write("Выберите пункт: ");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        break;
+                    case "4":
+                        break;
+                    case "5":
+                        break;
+                    case "0":
+                        running = false;
+                        Console.WriteLine("Выход из программы.");
+                        break;
+                    default:
+                        Console.WriteLine("Неизвестный пункт меню. Попробуйте снова.");
+                        break;
                 }
             }
         }

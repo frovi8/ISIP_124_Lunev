@@ -102,8 +102,10 @@ namespace ConsoleApp1
                 switch (choice)
                 {
                     case "1":
+                        PrintOperations(names, amounts);
                         break;
                     case "2":
+                        PrintStatistics(amounts);
                         break;
                     case "3":
                         BubbleSortByPrice(names, amounts);
@@ -112,6 +114,7 @@ namespace ConsoleApp1
                         break;
                         break;
                     case "4":
+                        ConvertCurrency(amounts);
                         break;
                     case "5":
                         break;
@@ -124,6 +127,76 @@ namespace ConsoleApp1
                         break;
                 }
             }
+        }
+
+        static void ConvertCurrency(double[] amounts)
+                {
+                    string[] currencyNames = { "USD (доллар США)", "EUR (евро)", "CNY (юань)" };
+                    double[] currencyRates = { 90.0, 98.0, 12.5 };
+
+                    Console.WriteLine("\n--- Конвертация валюты ---");
+                    Console.WriteLine("1. Ввести курс вручную");
+                    Console.WriteLine("2. Выбрать валюту из списка");
+                    Console.Write("Выберите способ: ");
+                    string method = Console.ReadLine();
+
+                    double rate = 0;
+                    bool rateChosen = false;
+                    string currencyLabel = "";
+
+                    if (method == "1")
+                    {
+                        bool isValid = false;
+                        while (!isValid)
+                        {
+                            Console.Write("Введите курс (сколько рублей за 1 единицу валюты): ");
+                            string input = Console.ReadLine();
+                            isValid = double.TryParse(input, out rate) && rate > 0;
+
+                            if (!isValid)
+                                Console.WriteLine("Курс должен быть положительным числом.");
+                        }
+                        currencyLabel = "выбранной валюте";
+                        rateChosen = true;
+                    }
+                    else if (method == "2")
+                    {
+                        for (int i = 0; i < currencyNames.Length; i++)
+                        {
+                            Console.WriteLine($"{i + 1}. {currencyNames[i]} (курс: {currencyRates[i]} руб.)");
+                        }
+
+                        Console.Write("Выберите номер валюты: ");
+                        string input = Console.ReadLine();
+                        int index;
+
+                        if (int.TryParse(input, out index) && index >= 1 && index <= currencyNames.Length)
+                        {
+                            rate = currencyRates[index - 1];
+                            currencyLabel = currencyNames[index - 1];
+                            rateChosen = true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Неверный номер валюты.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Неизвестный способ.");
+                    }
+
+                    if (rateChosen)
+                    {
+                        Console.WriteLine($"\n--- Суммы в {currencyLabel} ---");
+                        for (int i = 0; i < amounts.Length; i++)
+                        {
+                            double converted = amounts[i] / rate;
+                            Console.WriteLine($"{i + 1}. {converted:0.00}");
+                        }
+                        Console.WriteLine("(Исходные суммы в рублях не изменены — это только отображение.)");
+                    }
+              
         }
         static void PrintOperations(string[] names, double[] amounts)
         {

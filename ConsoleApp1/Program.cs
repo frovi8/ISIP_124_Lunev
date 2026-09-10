@@ -16,6 +16,8 @@ namespace ConsoleApp1
 
             string[] names = new string[count];
             double[] amounts = new double[count];
+
+            ReadOperations(names, amounts);
         }
 
         static int ReadOperationsCount()
@@ -38,6 +40,46 @@ namespace ConsoleApp1
             while (!isValid);
 
             return count;
+        }
+
+        static void ReadOperations(string[] names, double[] amounts)
+        {
+            Console.WriteLine("\nВводите траты по шаблону: Название услуги или товара;Количество денег");
+            Console.WriteLine("Пример: Влажные салфетки \"Лента\";235\n");
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                bool isValid = false;
+
+                while (!isValid)
+                {
+                    Console.Write($"Операция {i + 1}/{names.Length}: ");
+                    string line = Console.ReadLine();
+
+                    int separatorIndex = line.IndexOf(';');
+
+                    if (separatorIndex < 0)
+                    {
+                        Console.WriteLine("Не найден разделитель ';'. Повторите ввод.");
+                        continue;
+                    }
+
+                    string name = line.Substring(0, separatorIndex).Trim();
+                    string amountPart = line.Substring(separatorIndex + 1).Trim();
+
+                    double amount;
+                    isValid = double.TryParse(amountPart, out amount) && name.Length > 0 && amount >= 0;
+
+                    if (!isValid)
+                    {
+                        Console.WriteLine("Некорректная запись. Проверьте название и сумму (сумма >= 0).");
+                        continue;
+                    }
+
+                    names[i] = name;
+                    amounts[i] = amount;
+                }
+            }
         }
     }
 }

@@ -117,6 +117,7 @@ namespace ConsoleApp1
                         ConvertCurrency(amounts);
                         break;
                     case "5":
+                        SearchByName(names, amounts);
                         break;
                     case "0":
                         running = false;
@@ -260,6 +261,31 @@ namespace ConsoleApp1
             string temp = a;
             a = b;
             b = temp;
+        }
+        static void SearchByName(string[] names, double[] amounts)
+        {
+            Console.Write("\nВведите название или часть названия для поиска: ");
+            string query = Console.ReadLine().Trim().ToLower();
+
+            bool found = false;
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (names[i].ToLower().Contains(query))
+                {
+                    if (!found)
+                    {
+                        Console.WriteLine("--- Результаты поиска ---");
+                        found = true;
+                    }
+                    Console.WriteLine($"{i + 1}. {names[i]} — {amounts[i]:0.00} руб.");
+                }
+            }
+
+            if (!found)
+            {
+                Console.WriteLine("Ничего не найдено.");
+            }
         }
     }
 }

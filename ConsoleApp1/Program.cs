@@ -77,6 +77,7 @@ namespace ShopInventory
                 Console.WriteLine("3 - Удалить товар");
                 Console.WriteLine("4 - Заказать поставку товара");
                 Console.WriteLine("5 - Продать товар");
+                Console.WriteLine("6 - Поиск товара");
                 Console.WriteLine("0 - Выход");
                 Console.Write("Выберите команду: ");
 
@@ -98,6 +99,9 @@ namespace ShopInventory
                         break;
                     case "5":
                         SellProduct();
+                        break;
+                    case "6":
+                        SearchProduct();
                         break;
                     case "0":
                         running = false;
@@ -274,6 +278,64 @@ namespace ShopInventory
             decimal total = found.Price * amount;
 
             Console.WriteLine("Продано " + amount + " шт. товара \"" + found.Name + "\" на сумму " + total + " руб.");
+        }
+
+        static void SearchProduct()
+        {
+            Console.WriteLine("Поиск товара");
+            Console.WriteLine("1 - По коду");
+            Console.WriteLine("2 - По названию");
+            Console.WriteLine("3 - По категории");
+            Console.Write("Ваш выбор: ");
+
+            string choice = Console.ReadLine();
+            List<Product> results = new List<Product>();
+
+            if (choice == "1")
+            {
+                int code = ReadNonNegativeInt("Введите код: ");
+                Product found = FindByCode(code);
+                if (found != null)
+                    results.Add(found);
+            }
+            else if (choice == "2")
+            {
+                Console.Write("Введите название (или часть названия): ");
+                string name = Console.ReadLine();
+
+                foreach (Product p in products)
+                {
+                    if (p.Name.ToLower().Contains(name.ToLower()))
+                        results.Add(p);
+                }
+            }
+            else if (choice == "3")
+            {
+                Category category = ReadCategory();
+
+                foreach (Product p in products)
+                {
+                    if (p.Category == category)
+                        results.Add(p);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Неверный выбор");
+                return;
+            }
+
+            if (results.Count == 0)
+            {
+                Console.WriteLine("Ничего не найдено");
+            }
+            else
+            {
+                foreach (Product p in results)
+                {
+                    p.PrintInfo();
+                }
+            }
         }
     }
 }

@@ -1,341 +1,231 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
 
-namespace ShopInventory
+namespace pr4
 {
-    enum Category
+    enum Genre
     {
-        Продукты,
-        Электроника,
-        Одежда
+        Фэнтези,
+        Детектив,
+        Роман
     }
-
-    class Product
+    internal class Book
     {
-        static int nextCode = 1;
+        private static int NextId = 1;
+        public int Id { get; private set; }
+        public string? Title { get; init; }
+        public string? Author { get; init; }
+        public Genre Genre { get; init; }
+        public int Year { get; init; }
+        public decimal Price { get; init; }
 
-        public int Code;
-        public string Name;
-        public decimal Price;
-        public int Quantity;
-        public Category Category;
-
-        public Product(string name, decimal price, int quantity, Category category)
+        public Book(string title, string author, Genre genre, int year, decimal price)
         {
-            Code = nextCode;
-            nextCode++;
-            Name = name;
+            Id = NextId++;
+            Title = title;
+            Author = author;
+            Genre = genre;
+            Year = year;
             Price = price;
-            Quantity = quantity;
-            Category = category;
         }
 
-        public void PrintInfo()
+        public void Print()
         {
-            Console.WriteLine();
-            Console.WriteLine("Код: " + Code);
-            Console.WriteLine("Название: " + Name);
-            Console.WriteLine("Цена: " + Price + " руб.");
-            Console.WriteLine("Количество: " + Quantity);
-            Console.WriteLine("В наличии: " + (Quantity > 0 ? "да" : "нет"));
-            Console.WriteLine("Категория: " + Category);
-            Console.WriteLine();
+            Console.WriteLine($"Id: {Id}");
+            Console.WriteLine($"Название: {Title}");
+            Console.WriteLine($"Автор: {Author}");
+            Console.WriteLine($"Жанр: {Genre}");
+            Console.WriteLine($"Год: {Year}");
+            Console.WriteLine($"Цена: {Price}");
         }
     }
-
     class Program
     {
-        static List<Product> products = new List<Product>();
+        static List<Book> books = new List<Book>();
 
         static void Main(string[] args)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-            FillTestData();
-            RunMenu();
+            AddBaseBook();
+            Start();
         }
 
-        static void FillTestData()
+        static void AddBaseBook()
         {
-            products.Add(new Product("Хлеб", 45.50m, 30, Category.Продукты));
-            products.Add(new Product("Молоко", 89.90m, 20, Category.Продукты));
-            products.Add(new Product("Наушники", 1500.00m, 10, Category.Электроника));
-            products.Add(new Product("Футболка", 799.00m, 15, Category.Одежда));
-            products.Add(new Product("Смартфон", 25990.00m, 5, Category.Электроника));
+            books.Add(new Book("Парампарам", "Иванов", Genre.Фэнтези, 2000, 100));
+            books.Add(new Book("Властелин колец", "Толкин", Genre.Фэнтези, 1954, 1200));
+            books.Add(new Book("Убийство в Восточном экспрессе", "Агата Кристи", Genre.Детектив, 1934, 450));
+            books.Add(new Book("Гордость и предубеждение", "Джейн Остин", Genre.Роман, 1813, 600));
+            books.Add(new Book("Гарри Поттер и философский камень", "Джоан Роулинг", Genre.Фэнтези, 1997, 800));
         }
 
-        static void RunMenu()
+        static void Start()
         {
-            bool running = true;
-
-            while (running)
+            while (true)
             {
-                Console.WriteLine();
-                Console.WriteLine("Учёт товаров в магазине");
-                Console.WriteLine("1 - Показать все товары");
-                Console.WriteLine("2 - Добавить товар");
-                Console.WriteLine("3 - Удалить товар");
-                Console.WriteLine("4 - Заказать поставку товара");
-                Console.WriteLine("5 - Продать товар");
-                Console.WriteLine("6 - Поиск товара");
-                Console.WriteLine("0 - Выход");
-                Console.Write("Выберите команду: ");
+                Console.WriteLine("Добавить книгу - 1");
+                Console.WriteLine("Удалить книгу - 2");
+                Console.WriteLine("Найти книгу - 3");
+                Console.WriteLine("Отсортировать книги - 4");
+                Console.WriteLine("Самую дорогая и самая дешёвая книга - 5");
+                Console.WriteLine("Сгруппировать по авторам - 6");
+                Console.Write("Ваш выбор: ");
 
-                string command = Console.ReadLine();
+                string? input = Console.ReadLine();
 
-                switch (command)
+                switch (input)
                 {
                     case "1":
-                        ShowAllProducts();
+                        AddBook();
                         break;
                     case "2":
-                        AddProduct();
+                        DelBook();
                         break;
                     case "3":
-                        RemoveProduct();
+                        SearchBook();
                         break;
                     case "4":
-                        OrderSupply();
+                        SortBooks();
                         break;
                     case "5":
-                        SellProduct();
+                        MaxAndMinBook();
                         break;
                     case "6":
-                        SearchProduct();
+                        GroupByAuthor();
                         break;
                     case "0":
-                        running = false;
+                        Console.WriteLine("poka");
                         break;
                     default:
-                        Console.WriteLine("Неверная команда, попробуйте снова.");
+                        Console.WriteLine("Некорректный ввод!");
                         break;
                 }
             }
         }
 
-        static void ShowAllProducts()
+        static string CheckString(string text)
         {
-            if (products.Count == 0)
-            {
-                Console.WriteLine("Список товаров пуст.");
-                return;
-            }
-
-            foreach (Product p in products)
-            {
-                p.PrintInfo();
-            }
-        }
-
-        static string ReadNonEmptyString(string prompt)
-        {
-            string input;
-            do
-            {
-                Console.Write(prompt);
-                input = Console.ReadLine();
-            } while (string.IsNullOrWhiteSpace(input));
-
-            return input;
-        }
-
-        static decimal ReadNonNegativeDecimal(string prompt)
-        {
-            decimal value;
             while (true)
             {
-                Console.Write(prompt);
-                string input = Console.ReadLine();
+                Console.Write(text);
+                string? input = Console.ReadLine();
 
-                if (decimal.TryParse(input, out value) && value >= 0)
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Console.WriteLine("Надо ввести хоть что то");
+                }
+                else
+                {
+                    return input;
+                }
+            }
+        }
+
+        static int CheckInt(string text)
+        {
+            while (true)
+            {
+                Console.Write(text);
+                string? input = Console.ReadLine();
+
+                if (int.TryParse(input, out int value))
+                {
                     return value;
-
-                Console.WriteLine("Ошибка: введите неотрицательное число.");
+                }
+                else
+                {
+                    Console.WriteLine("Ввод некорректен");
+                }
             }
         }
-
-        static int ReadNonNegativeInt(string prompt)
+        static decimal CheckDecimal(string text)
         {
-            int value;
             while (true)
             {
-                Console.Write(prompt);
-                string input = Console.ReadLine();
+                Console.Write(text);
+                string? input = Console.ReadLine();
 
-                if (int.TryParse(input, out value) && value >= 0)
+                if (decimal.TryParse(input, out decimal value))
+                {
                     return value;
-
-                Console.WriteLine("Ошибка: введите целое неотрицательное число.");
+                }
+                else
+                {
+                    Console.WriteLine("Ввод некорректен");
+                }
             }
         }
 
-        static Category ReadCategory()
+        static Genre CheckEnum(string text)
         {
-            Console.WriteLine("Выберите категорию:");
-            Console.WriteLine("1 - Продукты");
-            Console.WriteLine("2 - Электроника");
-            Console.WriteLine("3 - Одежда");
-
             while (true)
             {
-                Console.Write("Ваш выбор: ");
-                string input = Console.ReadLine();
+                int input = CheckInt(text);
 
-                if (input == "1") return Category.Продукты;
-                if (input == "2") return Category.Электроника;
-                if (input == "3") return Category.Одежда;
-
-                Console.WriteLine("Ошибка: введите 1, 2 или 3.");
-            }
-        }
-
-        static void AddProduct()
-        {
-            Console.WriteLine("Добавление нового товара");
-
-            string name = ReadNonEmptyString("Введите название товара: ");
-            decimal price = ReadNonNegativeDecimal("Введите цену товара: ");
-            int quantity = ReadNonNegativeInt("Введите количество товара: ");
-            Category category = ReadCategory();
-
-            Product newProduct = new Product(name, price, quantity, category);
-            products.Add(newProduct);
-
-            Console.WriteLine("Товар добавлен. Код товара: " + newProduct.Code);
-        }
-
-        static Product FindByCode(int code)
-        {
-            foreach (Product p in products)
-            {
-                if (p.Code == code)
-                    return p;
-            }
-            return null;
-        }
-
-        static void RemoveProduct()
-        {
-            Console.WriteLine("Удаление товара");
-            int code = ReadNonNegativeInt("Введите код товара для удаления: ");
-
-            Product found = FindByCode(code);
-            if (found == null)
-            {
-                Console.WriteLine("Товар с таким кодом не найден.");
-                return;
-            }
-
-            products.Remove(found);
-            Console.WriteLine("Товар \"" + found.Name + "\" удалён.");
-        }
-
-        static void OrderSupply()
-        {
-            Console.WriteLine("Заказ поставки товара");
-            int code = ReadNonNegativeInt("Введите код товара: ");
-
-            Product found = FindByCode(code);
-            if (found == null)
-            {
-                Console.WriteLine("Товар с таким кодом не найден.");
-                return;
-            }
-
-            int amount = ReadNonNegativeInt("Введите количество для поставки: ");
-            found.Quantity += amount;
-
-            Console.WriteLine("Поставка оформлена. Новое количество: " + found.Quantity);
-        }
-
-        static void SellProduct()
-        {
-            Console.WriteLine("Продажа товара");
-            int code = ReadNonNegativeInt("Введите код товара: ");
-
-            Product found = FindByCode(code);
-            if (found == null)
-            {
-                Console.WriteLine("Товар с таким кодом не найден.");
-                return;
-            }
-
-            if (found.Quantity == 0)
-            {
-                Console.WriteLine("Товара \"" + found.Name + "\" нет в наличии.");
-                return;
-            }
-
-            int amount = ReadNonNegativeInt("Введите количество для продажи: ");
-
-            if (amount > found.Quantity)
-            {
-                Console.WriteLine("Недостаточно товара на складе. В наличии: " + found.Quantity);
-                return;
-            }
-
-            found.Quantity -= amount;
-            decimal total = found.Price * amount;
-
-            Console.WriteLine("Продано " + amount + " шт. товара \"" + found.Name + "\" на сумму " + total + " руб.");
-        }
-
-        static void SearchProduct()
-        {
-            Console.WriteLine("Поиск товара");
-            Console.WriteLine("1 - По коду");
-            Console.WriteLine("2 - По названию");
-            Console.WriteLine("3 - По категории");
-            Console.Write("Ваш выбор: ");
-
-            string choice = Console.ReadLine();
-            List<Product> results = new List<Product>();
-
-            if (choice == "1")
-            {
-                int code = ReadNonNegativeInt("Введите код: ");
-                Product found = FindByCode(code);
-                if (found != null)
-                    results.Add(found);
-            }
-            else if (choice == "2")
-            {
-                Console.Write("Введите название (или часть названия): ");
-                string name = Console.ReadLine();
-
-                foreach (Product p in products)
+                switch (input)
                 {
-                    if (p.Name.ToLower().Contains(name.ToLower()))
-                        results.Add(p);
+                    case 1:
+                        return Genre.Фэнтези;
+                    case 2:
+                        return Genre.Детектив;
+                    case 3:
+                        return Genre.Роман;
+                    default:
+                        Console.WriteLine("Некорректный ввод!");
+                        break;
                 }
             }
-            else if (choice == "3")
-            {
-                Category category = ReadCategory();
+        }
 
-                foreach (Product p in products)
+        static void AddBook()
+        {
+            string title = CheckString("Введите название: ");
+            string author = CheckString("Введите автора: ");
+            Genre genre = CheckEnum("Введите жанр (1 - Фэнтези, 2 - Детектив, 3 - Роман): ");
+            int year = CheckInt("Введите год: ");
+            decimal price = CheckDecimal("Введите цену: ");
+
+            books.Add(new Book(title, author, genre, year, price));
+        }
+
+        static void DelBook()
+        {
+            int input = CheckInt("Введите идентификатор для удаления: ");
+
+            foreach (var b in books)
+            {
+                if (b.Id == input)
                 {
-                    if (p.Category == category)
-                        results.Add(p);
+                    books.Remove(b);
+                    Console.WriteLine("Книга удалена");
+                    return;
                 }
             }
-            else
-            {
-                Console.WriteLine("Неверный выбор");
-                return;
-            }
 
-            if (results.Count == 0)
+            Console.WriteLine("Книга не найдена");
+        }
+
+        static void SearchBook()
+        {
+            foreach (var b in books)
             {
-                Console.WriteLine("Ничего не найдено");
+                Console.WriteLine($"{b.Id}, {b.Title}");
             }
-            else
-            {
-                foreach (Product p in results)
-                {
-                    p.PrintInfo();
-                }
-            }
+        }
+
+        static void SortBooks()
+        {
+
+        }
+
+        static void MaxAndMinBook()
+        {
+
+        }
+
+        static void GroupByAuthor()
+        {
+
         }
     }
 }

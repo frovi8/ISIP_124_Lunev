@@ -1,341 +1,215 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Text;
 
-namespace ShopInventory
+namespace pr3
 {
-    enum Category
+    internal class Program
     {
-        Продукты,
-        Электроника,
-        Одежда
-    }
-
-    class Product
-    {
-        static int nextCode = 1;
-
-        public int Code;
-        public string Name;
-        public decimal Price;
-        public int Quantity;
-        public Category Category;
-
-        public Product(string name, decimal price, int quantity, Category category)
+        static string? Text()
         {
-            Code = nextCode;
-            nextCode++;
-            Name = name;
-            Price = price;
-            Quantity = quantity;
-            Category = category;
-        }
+            while (true)
+            {
+                Console.Write("Введите текст (> 100 символов): ");
+                string? text = Console.ReadLine();
+                Console.WriteLine();
 
-        public void PrintInfo()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Код: " + Code);
-            Console.WriteLine("Название: " + Name);
-            Console.WriteLine("Цена: " + Price + " руб.");
-            Console.WriteLine("Количество: " + Quantity);
-            Console.WriteLine("В наличии: " + (Quantity > 0 ? "да" : "нет"));
-            Console.WriteLine("Категория: " + Category);
-            Console.WriteLine();
-        }
-    }
+                if (text == "esc")
+                {
+                    return null;
+                }
 
-    class Program
-    {
-        static List<Product> products = new List<Product>();
+                if (text?.Length > 100)
+                {
+                    return text;
+                }
+                else
+                {
+                    Console.WriteLine("Количество символов должно быть > 100");
+                }
+            }
+            // По реке плывет кораблик. Он плывет издалека. На кораблике четыре Очень храбрых моряка. У них ушки на макушке, У них длинные хвосты, И страшны им только кошки, Только кошки да коты
+        }
 
         static void Main(string[] args)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-            FillTestData();
-            RunMenu();
+            Start();
         }
 
-        static void FillTestData()
-        {
-            products.Add(new Product("Хлеб", 45.50m, 30, Category.Продукты));
-            products.Add(new Product("Молоко", 89.90m, 20, Category.Продукты));
-            products.Add(new Product("Наушники", 1500.00m, 10, Category.Электроника));
-            products.Add(new Product("Футболка", 799.00m, 15, Category.Одежда));
-            products.Add(new Product("Смартфон", 25990.00m, 5, Category.Электроника));
-        }
+        static List<string> list = new List<string>();
 
-        static void RunMenu()
+        static void Start()
         {
             bool running = true;
 
             while (running)
             {
+
+                Console.WriteLine("Выберите опцию: ");
+                Console.WriteLine("Вввести текст - 1");
+                Console.WriteLine("Просмотр истории статистики - 2");
+                Console.WriteLine("Выход - 0");
                 Console.WriteLine();
-                Console.WriteLine("Учёт товаров в магазине");
-                Console.WriteLine("1 - Показать все товары");
-                Console.WriteLine("2 - Добавить товар");
-                Console.WriteLine("3 - Удалить товар");
-                Console.WriteLine("4 - Заказать поставку товара");
-                Console.WriteLine("5 - Продать товар");
-                Console.WriteLine("6 - Поиск товара");
-                Console.WriteLine("0 - Выход");
-                Console.Write("Выберите команду: ");
+                Console.Write("Ваш выбор: ");
 
-                string command = Console.ReadLine();
+                string? input = Console.ReadLine();
+                Console.Clear();
 
-                switch (command)
+                switch (input)
                 {
                     case "1":
-                        ShowAllProducts();
+                        string checkText = Text();
+                        if (checkText != null)
+                        {
+                            string his = Build(checkText);
+                            list.Add(his);
+                            Console.WriteLine(his);
+                            Console.WriteLine("Нажмите любую клавишу для выхода");
+                            Console.ReadKey();
+                            Console.Clear();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                        }
                         break;
                     case "2":
-                        AddProduct();
-                        break;
-                    case "3":
-                        RemoveProduct();
-                        break;
-                    case "4":
-                        OrderSupply();
-                        break;
-                    case "5":
-                        SellProduct();
-                        break;
-                    case "6":
-                        SearchProduct();
+                        if (list.Count != 0)
+                            foreach (string his in list) { Console.WriteLine(his); }
+                        else
+                            Console.WriteLine("Сначала введите текст!");
+                        Console.WriteLine("Нажмите любую клавишу для выхода");
+                        Console.ReadKey();
+                        Console.Clear();
                         break;
                     case "0":
                         running = false;
                         break;
                     default:
-                        Console.WriteLine("Неверная команда, попробуйте снова.");
+                        Console.WriteLine("Некорректный ввод (только 1, 2 или 0)");
                         break;
                 }
             }
         }
-
-        static void ShowAllProducts()
+        static string Build(string text)
         {
-            if (products.Count == 0)
-            {
-                Console.WriteLine("Список товаров пуст.");
-                return;
-            }
+            StringBuilder sb = new StringBuilder();
+            string t = text.Substring(0, 15);
+            sb.AppendLine($"{t}...");
+            var (v, c) = VowelsAndConsonants(text);
+            sb.AppendLine($"Количество слов: {WordCount(text)}");
+            sb.AppendLine($"Самое короткое слово: {MinWord(text)}");
+            sb.AppendLine($"Количество предложений: {Sentence(text)}");
+            sb.AppendLine($"Количество гласных: {v}, количество согласных: {c}");
+            sb.AppendLine($"Самое длинное слово: {MaxWord(text)}");
+            sb.AppendLine($"Частота встречаемости букв:\n{Staristic(text)}");
 
-            foreach (Product p in products)
-            {
-                p.PrintInfo();
-            }
+            return sb.ToString();
         }
 
-        static string ReadNonEmptyString(string prompt)
+        static int WordCount(string text)
         {
-            string input;
-            do
-            {
-                Console.Write(prompt);
-                input = Console.ReadLine();
-            } while (string.IsNullOrWhiteSpace(input));
+            string[] splitText = Symbols.Wrods(text);
 
-            return input;
+            return splitText.Length;
         }
 
-        static decimal ReadNonNegativeDecimal(string prompt)
+        static string MinWord(string text)
         {
-            decimal value;
-            while (true)
+            string[] splitText = Symbols.Wrods(text);
+
+            string min = splitText[0];
+
+            for (int i = 1; i < splitText.Length; i++)
             {
-                Console.Write(prompt);
-                string input = Console.ReadLine();
-
-                if (decimal.TryParse(input, out value) && value >= 0)
-                    return value;
-
-                Console.WriteLine("Ошибка: введите неотрицательное число.");
-            }
-        }
-
-        static int ReadNonNegativeInt(string prompt)
-        {
-            int value;
-            while (true)
-            {
-                Console.Write(prompt);
-                string input = Console.ReadLine();
-
-                if (int.TryParse(input, out value) && value >= 0)
-                    return value;
-
-                Console.WriteLine("Ошибка: введите целое неотрицательное число.");
-            }
-        }
-
-        static Category ReadCategory()
-        {
-            Console.WriteLine("Выберите категорию:");
-            Console.WriteLine("1 - Продукты");
-            Console.WriteLine("2 - Электроника");
-            Console.WriteLine("3 - Одежда");
-
-            while (true)
-            {
-                Console.Write("Ваш выбор: ");
-                string input = Console.ReadLine();
-
-                if (input == "1") return Category.Продукты;
-                if (input == "2") return Category.Электроника;
-                if (input == "3") return Category.Одежда;
-
-                Console.WriteLine("Ошибка: введите 1, 2 или 3.");
-            }
-        }
-
-        static void AddProduct()
-        {
-            Console.WriteLine("Добавление нового товара");
-
-            string name = ReadNonEmptyString("Введите название товара: ");
-            decimal price = ReadNonNegativeDecimal("Введите цену товара: ");
-            int quantity = ReadNonNegativeInt("Введите количество товара: ");
-            Category category = ReadCategory();
-
-            Product newProduct = new Product(name, price, quantity, category);
-            products.Add(newProduct);
-
-            Console.WriteLine("Товар добавлен. Код товара: " + newProduct.Code);
-        }
-
-        static Product FindByCode(int code)
-        {
-            foreach (Product p in products)
-            {
-                if (p.Code == code)
-                    return p;
-            }
-            return null;
-        }
-
-        static void RemoveProduct()
-        {
-            Console.WriteLine("Удаление товара");
-            int code = ReadNonNegativeInt("Введите код товара для удаления: ");
-
-            Product found = FindByCode(code);
-            if (found == null)
-            {
-                Console.WriteLine("Товар с таким кодом не найден.");
-                return;
-            }
-
-            products.Remove(found);
-            Console.WriteLine("Товар \"" + found.Name + "\" удалён.");
-        }
-
-        static void OrderSupply()
-        {
-            Console.WriteLine("Заказ поставки товара");
-            int code = ReadNonNegativeInt("Введите код товара: ");
-
-            Product found = FindByCode(code);
-            if (found == null)
-            {
-                Console.WriteLine("Товар с таким кодом не найден.");
-                return;
-            }
-
-            int amount = ReadNonNegativeInt("Введите количество для поставки: ");
-            found.Quantity += amount;
-
-            Console.WriteLine("Поставка оформлена. Новое количество: " + found.Quantity);
-        }
-
-        static void SellProduct()
-        {
-            Console.WriteLine("Продажа товара");
-            int code = ReadNonNegativeInt("Введите код товара: ");
-
-            Product found = FindByCode(code);
-            if (found == null)
-            {
-                Console.WriteLine("Товар с таким кодом не найден.");
-                return;
-            }
-
-            if (found.Quantity == 0)
-            {
-                Console.WriteLine("Товара \"" + found.Name + "\" нет в наличии.");
-                return;
-            }
-
-            int amount = ReadNonNegativeInt("Введите количество для продажи: ");
-
-            if (amount > found.Quantity)
-            {
-                Console.WriteLine("Недостаточно товара на складе. В наличии: " + found.Quantity);
-                return;
-            }
-
-            found.Quantity -= amount;
-            decimal total = found.Price * amount;
-
-            Console.WriteLine("Продано " + amount + " шт. товара \"" + found.Name + "\" на сумму " + total + " руб.");
-        }
-
-        static void SearchProduct()
-        {
-            Console.WriteLine("Поиск товара");
-            Console.WriteLine("1 - По коду");
-            Console.WriteLine("2 - По названию");
-            Console.WriteLine("3 - По категории");
-            Console.Write("Ваш выбор: ");
-
-            string choice = Console.ReadLine();
-            List<Product> results = new List<Product>();
-
-            if (choice == "1")
-            {
-                int code = ReadNonNegativeInt("Введите код: ");
-                Product found = FindByCode(code);
-                if (found != null)
-                    results.Add(found);
-            }
-            else if (choice == "2")
-            {
-                Console.Write("Введите название (или часть названия): ");
-                string name = Console.ReadLine();
-
-                foreach (Product p in products)
+                if (splitText[i].Length < min.Length)
                 {
-                    if (p.Name.ToLower().Contains(name.ToLower()))
-                        results.Add(p);
+                    min = splitText[i];
                 }
             }
-            else if (choice == "3")
-            {
-                Category category = ReadCategory();
+            return min;
+        }
 
-                foreach (Product p in products)
+        static string MaxWord(string text)
+        {
+            string[] splitText = Symbols.Wrods(text);
+
+            string max = splitText[0];
+
+            for (int i = 1; i < splitText.Length; i++)
+            {
+                if (splitText[i].Length > max.Length)
                 {
-                    if (p.Category == category)
-                        results.Add(p);
+                    max = splitText[i];
                 }
             }
-            else
-            {
-                Console.WriteLine("Неверный выбор");
-                return;
-            }
+            return max;
+        }
 
-            if (results.Count == 0)
+        static int Sentence(string text)
+        {
+            string[] splitText = Symbols.Sentence(text);
+
+            return splitText.Length;
+        }
+
+        static (int countVowels, int countConsonants) VowelsAndConsonants(string text)
+        {
+            int countVowels = 0;
+            int countConsonants = 0;
+            for (int i = 0; i < text.Length; i++)
             {
-                Console.WriteLine("Ничего не найдено");
-            }
-            else
-            {
-                foreach (Product p in results)
+                if (Symbols.Vowels(text[i]) == true)
                 {
-                    p.PrintInfo();
+                    countVowels++;
+                }
+                else if (char.IsLetter(text[i]) && text[i] != 'ь' && text[i] != 'ъ')
+                {
+                    countConsonants++;
                 }
             }
+            return (countVowels, countConsonants);
+        }
+
+        static string Staristic(string text)
+        {
+            var dictionary = new Dictionary<char, int>();
+
+            var words = Symbols.Wrods(text.ToLower());
+
+            var letters = Symbols.Letters(words);
+
+            foreach (char c in letters)
+            {
+                if (char.IsLetter(c))
+                {
+                    if (dictionary.ContainsKey(c))
+                    {
+                        dictionary[c] += 1;
+                    }
+                    else
+                    {
+                        dictionary.Add(c, 1);
+                    }
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            int count = 0;
+
+            foreach (var letter in dictionary)
+            {
+                count++;
+
+                if (count < 4)
+                    sb.Append($"[{letter.Key}]: {letter.Value}  \t");
+                else
+                {
+                    sb.Append($"[{letter.Key}]: {letter.Value}  \n");
+                    count = 0;
+                }
+            }
+            return sb.ToString();
         }
     }
 }
